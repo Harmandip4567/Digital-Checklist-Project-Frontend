@@ -8,6 +8,7 @@ import Signup from "./pages/Signup.jsx";
 import Login from "./pages/Login.jsx";
 import AdminDashboard from "./pages/AdminDashboad.jsx";
 import MaintainerDashboard from "./pages/MaintainerDashboad.jsx";
+import CreateTemplate from "./pages/CreateTemplate.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
@@ -25,6 +26,9 @@ createRoot(document.getElementById("root")).render(
 
         {/* Maintainer Dashboard */}
         <Route path="/maintainer-dashboard" element={<MaintainerDashboard />} />
+        {/*creating temperates for admin*/}
+        <Route path="/Create-template" element={<CreateTemplate />} />
+        
       </Routes>
     </BrowserRouter>
   </StrictMode>
