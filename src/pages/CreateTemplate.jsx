@@ -46,7 +46,7 @@ function CreateTemplate() {
     
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post("http://localhost:8080/checklist/templates", payload, {
+      const res = await axios.post("http://localhost:8000/checklist/templates", payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
       alert("Template created");

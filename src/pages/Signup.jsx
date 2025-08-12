@@ -16,7 +16,7 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:8080/auth/signup", formData); // Data goes to backend in object format
+      const res = await axios.post("http://localhost:8000/auth/signup", formData); // Data goes to backend in object format
       alert("Signup successful!");
       useNavigate("/login"); // Redirect to login page after successful signup
     } catch (error) {

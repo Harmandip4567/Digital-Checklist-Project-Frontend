@@ -9,7 +9,7 @@ function AdminDashboard() {
     const token = localStorage.getItem("token");
     
     if (userId && token) {
-      axios.get(`http://localhost:8080/users/${userId}`, {
+      axios.get(`http://localhost:8000/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` }
       })
       .then(res => setAdmin(res.data))
@@ -25,7 +25,7 @@ function AdminDashboard() {
       <p>Role: {admin.role}</p>
       <p>Email: {admin.email}</p>
        {/* Add Button */}
-      <button onClick={() => navigate("/create-template")}>
+      <button onClick={() => navigate("/Create-template")}>
         Create Checklist Template
       </button>
     </div>
