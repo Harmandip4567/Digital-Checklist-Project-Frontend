@@ -9,7 +9,8 @@ import Login from "./pages/Login.jsx";
 import AdminDashboard from "./pages/AdminDashboad.jsx";
 import MaintainerDashboard from "./pages/MaintainerDashboad.jsx";
 import CreateTemplate from "./pages/CreateTemplate.jsx";
-
+import ExistingTemplates from "./pages/ExistingTemplates.jsx";
+import TemplateItems from "./pages/TemplateItems.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />
@@ -29,7 +30,8 @@ createRoot(document.getElementById("root")).render(
         <Route path="/maintainer-dashboard" element={<MaintainerDashboard />} />
         {/*creating temperates for admin*/}
         <Route path="/Create-template" element={<CreateTemplate />} />
-        
+        <Route path="/ExistingTemplates" element={<ExistingTemplates/>} />
+        <Route path="/template/:id" element={<TemplateItems/>} />
       </Routes>
     </BrowserRouter>
   </StrictMode>

@@ -44,6 +44,12 @@ function AdminDashboard() {
           >
             Create Checklist Template
           </button>
+          <button
+            onClick={() => navigate("/ExistingTemplates")}
+            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition"
+          >
+            Existing Checklists
+          </button>
         </div>
       
     
