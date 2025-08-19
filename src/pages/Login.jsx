@@ -45,11 +45,7 @@ function Login() {
 
   return (
     <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{
-        background: "linear-gradient(135deg, #004C97, #0072CE)",
-      }}
-    >
+      className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-tr from-[#004C97] to-[#0072CE]">
       <div className="bg-white shadow-2xl rounded-lg w-full max-w-sm p-6">
         {/* JSW Logo */}
         <div className="flex justify-center mb-4">

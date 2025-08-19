@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from "react";
-
+import { FaUserCircle } from "react-icons/fa"; //used for using user icon
 export default function UserAccountDropdown({ user }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
+  
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -23,18 +24,8 @@ export default function UserAccountDropdown({ user }) {
       <button
         onClick={() => setOpen((o) => !o)}
         aria-label="User account"
-        style={{
-          background: "none",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-        }}
-      >
-        <img
-    src="/useraccountt.webp"  // Replace with your actual image path
-    alt="User account"
-    style={{ height: 32, width: 32, objectFit: "contain" }}
-  />
+        className="p-1 rounded-full hover:bg-blue-500 transition cursor-pointer">
+         <FaUserCircle className="text-2xl " />
         
       </button>
 
@@ -56,9 +47,9 @@ export default function UserAccountDropdown({ user }) {
             userSelect: "none",
           }}
         >
-          <p><strong>Username:</strong> {user.username}</p>
-          <p><strong>Role:</strong> {user.role}</p>
-          <p><strong>Email:</strong> {user.email}</p>
+          <p className="text-blue-600"><strong>Username:</strong> {user.username}</p>
+          <p className="text-blue-600"><strong>Role:</strong> {user.role}</p>
+          <p className="text-blue-600"><strong>Email:</strong> {user.email}</p>
         </div>
       )}
     </div>
