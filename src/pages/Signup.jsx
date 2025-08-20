@@ -84,8 +84,8 @@ const Signup = () => {
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-[#004C97] outline-none transition"
           >
             <option value="">Select Role</option>
-            <option value="admin">Admin</option>
-            <option value="maintainer">Maintainer</option>
+            <option value="Admin">Admin</option>
+            <option value="Maintainer">Maintainer</option>
           </select>
 
           <button

@@ -86,7 +86,7 @@ function EditTemplate({ template, templateItems, onClose, onSave }) {
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 font-semibold">
               <tr>
-                <th className="px-4 py-3">ID</th>
+                
                 <th className="px-4 py-3">Label</th>
                 <th className="px-4 py-3">Input Type</th>
                 <th className="px-4 py-3 text-center">Required</th>
@@ -102,15 +102,7 @@ function EditTemplate({ template, templateItems, onClose, onSave }) {
                     index % 2 === 0 ? "bg-white" : "bg-gray-50"
                   }`}
                 >
-                  <td className="px-4 py-2">
-                    <input
-                      value={item.id}
-                      onChange={(e) =>
-                        handleItemChange(index, "id", e.target.value)
-                      }
-                      className="w-20 px-2 py-1 border border-gray-300 rounded-lg focus:ring-1 focus:ring-blue-500 focus:outline-none"
-                    />
-                  </td>
+                  
                   <td className="px-4 py-2">
                     <input
                       value={item.label}

@@ -109,9 +109,9 @@ function CreateTemplate() {
                     >
                       <option value="text">Text</option>
                       <option value="number">Number</option>
-                      <option value="select">Select / Dropdown</option>
+                      {/* <option value="select">Select / Dropdown</option> */}
                       <option value="checkbox">Checkbox</option>
-                      <option value="date">Date</option>
+                      {/* <option value="date">Date</option> */}
                     </select>
                   </div>
                 </div>

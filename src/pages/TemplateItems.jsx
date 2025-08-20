@@ -4,13 +4,13 @@ import { useParams } from "react-router-dom";
 import EditTemplate from "./EditTemplate";
 import { FiEdit3 } from "react-icons/fi";
 import { MdOutlineInventory2 } from "react-icons/md";
-
+import AddItemsInTemplate from "./AddItemsInTemplate";
 function TemplateItems() {
   const { id } = useParams();
   const [templateItems, setTemplateItems] = useState([]);
   const [template, setTemplate] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-
+  const[isAdding, setIsAdding] = useState(false);
   useEffect(() => {
     fetchTemplateItems();
   }, [id]);
@@ -40,13 +40,17 @@ function TemplateItems() {
       {/* Template Info Card */}
       {template ? (
         <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 mb-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">{template.title}</h2>
-          <p className="text-gray-600 mb-4">{template.description || "No description"}</p>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            {template.title}
+          </h2>
+          <p className="text-gray-600 mb-4">
+            {template.description || "No description"}
+          </p>
           <p className="text-sm text-gray-500">
             <span className="font-medium">Created At:</span>{" "}
             {new Date(template.created_at).toLocaleString()}
           </p>
-
+          {/* edit template Button */}
           <button
             onClick={() => setIsEditing(true)}
             className="mt-4 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition-all"
@@ -54,13 +58,22 @@ function TemplateItems() {
             <FiEdit3 size={18} />
             Edit Template
           </button>
+          {/* {add Item Button} */}
+          <button
+            onClick={() => setIsAdding(true)}
+            className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md"
+          >
+            + Add Item
+          </button>
         </div>
       ) : (
         <p className="text-gray-500">Loading template details...</p>
       )}
 
       {/* Template Items Table */}
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">Template Items</h2>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
+        Template Items
+      </h2>
       {templateItems.length > 0 ? (
         <div className="overflow-x-auto bg-white rounded-2xl shadow-lg border border-gray-200">
           <table className="w-full border-collapse">
@@ -82,7 +95,9 @@ function TemplateItems() {
                     index % 2 === 0 ? "bg-gray-50" : "bg-white"
                   } hover:bg-indigo-50 transition`}
                 >
-                  <td className="px-6 py-3 font-medium text-gray-700">{item.id}</td>
+                  <td className="px-6 py-3 font-medium text-gray-700">
+                    {item.id}
+                  </td>
                   <td className="px-6 py-3 text-gray-600">{item.label}</td>
                   <td className="px-6 py-3 text-gray-600">{item.input_type}</td>
                   <td className="px-6 py-3">
@@ -96,8 +111,12 @@ function TemplateItems() {
                       {item.required ? "Yes" : "No"}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-gray-600">{item.frequency || "-"}</td>
-                  <td className="px-6 py-3 text-gray-600">{item.unit || "-"}</td>
+                  <td className="px-6 py-3 text-gray-600">
+                    {item.frequency || "-"}
+                  </td>
+                  <td className="px-6 py-3 text-gray-600">
+                    {item.unit || "-"}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -107,7 +126,7 @@ function TemplateItems() {
         <p className="text-gray-500">No items found for this template.</p>
       )}
 
-      {/* Edit Modal */}
+      {/* Edit template and item */}
       {isEditing && (
         <EditTemplate
           template={template}
@@ -120,6 +139,17 @@ function TemplateItems() {
           }}
         />
       )}
+      {/* {Add Item} */}
+      {isAdding && (
+  <AddItemsInTemplate
+    templateId={template.id}
+    onClose={() => setIsAdding(false)}
+    onSave={(newItem) => {
+      setTemplateItems([...templateItems, newItem]);
+      setIsAdding(false);
+    }}
+  />
+)}
     </div>
   );
 }
