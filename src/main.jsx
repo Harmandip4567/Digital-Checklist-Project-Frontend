@@ -11,6 +11,7 @@ import MaintainerDashboard from "./pages/MaintainerDashboad.jsx";
 import CreateTemplate from "./pages/CreateTemplate.jsx";
 import ExistingTemplates from "./pages/ExistingTemplates.jsx";
 import TemplateItems from "./pages/TemplateItems.jsx";
+import MaintainerChecklists from "./pages/MaintainerChecklists.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />
@@ -31,7 +32,8 @@ createRoot(document.getElementById("root")).render(
         {/*creating temperates for admin*/}
         <Route path="/Create-template" element={<CreateTemplate />} />
         <Route path="/ExistingTemplates" element={<ExistingTemplates/>} />
-        <Route path="/template/:id" element={<TemplateItems/>} />
+        <Route path="/template/:id" element={<TemplateItems />} />
+        <Route path="/maintainer-checklists" element={<MaintainerChecklists />} />
       </Routes>
     </BrowserRouter>
   </StrictMode>
