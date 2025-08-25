@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaSearch, FaRegFileAlt } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
-function MaintainerChecklists() {
+const MaintainerChecklists = () => {
   const [templates, setTemplates] = useState([]);
   const [search, setSearch] = useState("");
-  const [updatingId, setUpdatingId] = useState(null);
-  const [statusMap, setStatusMap] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchTemplates();
@@ -18,35 +19,27 @@ function MaintainerChecklists() {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTemplates(res.data);
-      // Initialize status map
-      const map = {};
-      res.data.forEach((t) => {
-        map[t.id] = t.status || "pending";
-      });
-      setStatusMap(map);
     } catch (err) {
       console.error("Error fetching templates:", err);
     }
   };
 
   const handleStatusChange = async (id, newStatus) => {
-    setUpdatingId(id);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8000/checklist/templates/${id}/status`,
-        {
-          status: newStatus,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      const res = await axios.put(
+        `http://localhost:8000/checklist/details/${id}/status`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-      setStatusMap((prev) => ({ ...prev, [id]: newStatus }));
+      setTemplates((prev) =>
+        prev.map((tpl) =>
+          tpl.id === id ? { ...tpl, status: res.data.status } : tpl
+        )
+      );
     } catch (err) {
       console.error("Error updating status:", err);
     }
-    setUpdatingId(null);
   };
 
   const filteredTemplates = templates.filter(
@@ -57,54 +50,69 @@ function MaintainerChecklists() {
   );
 
   return (
-    <div className="min-h-screen bg-[#004C97] text-white px-6 py-8">
-      <h1 className="text-3xl font-bold mb-6">Maintainer Checklists</h1>
-      <div className="mb-6 flex items-center w-full md:w-1/2 bg-white/10 backdrop-blur-md border border-white/20 rounded-xl px-4 py-3 shadow-lg">
+    <div className="min-h-screen bg-gradient-to-tr from-blue-50 to-blue-100 font-sans px-6 py-8">
+      <h1 className="text-4xl font-extrabold text-gray-800 mb-8 tracking-tight">
+        Existing Templates
+      </h1>
+
+      {/* Search box */}
+      <div className="mb-8 flex items-center w-full md:w-1/2 bg-white rounded-xl px-4 py-3 shadow-md border border-gray-200 transition hover:shadow-lg hover:bg-gray-50">
+        <FaSearch className="text-gray-400 mr-3 text-lg transition duration-300 hover:text-blue-500" />
         <input
           type="text"
-          placeholder="Search checklists..."
+          placeholder="Search templates..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="bg-transparent text-white placeholder-white/70 outline-none w-full"
+          className="bg-transparent text-gray-800 placeholder-gray-400 outline-none w-full font-medium transition"
         />
       </div>
+      {filteredTemplates.map((template) => (
+        <div
+          key={template.id}
+          className="p-6 rounded-2xl bg-white shadow-md border border-gray-200 hover:shadow-2xl hover:scale-105 transition-all cursor-pointer"
+          onClick={() => navigate(`/maintainer-template/${template.id}`)} // <-- Add this here
+        >
+          <div className="flex items-center gap-3 mb-3">
+            <FaRegFileAlt className="text-blue-600 text-2xl transition duration-300 hover:text-blue-800" />
+            <h3 className="text-2xl font-semibold text-gray-800 transition">
+              {template.title}
+            </h3>
+          </div>
+          <p className="text-gray-600 mb-3">
+            {template.description || "No description available"}
+          </p>
+          <small className="text-gray-400 block">
+            Created: {new Date(template.created_at).toLocaleDateString()}
+          </small>
+          <p className="mt-2 text-gray-700 font-medium">
+            Status: {template.status}
+          </p>
+          <button
+            className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+            onClick={(e) => {
+              e.stopPropagation(); // Prevent card click from triggering navigation
+              handleStatusChange(
+                template.id,
+                template.status === "pending" ? "completed" : "pending"
+              );
+            }}
+          >
+            Mark as {template.status === "pending" ? "Completed" : "Pending"}
+          </button>
+          {/* No edit/add buttons for maintainer */}
+        </div>
+      ))}
+
+      {/* Template list */}
       {filteredTemplates.length > 0 ? (
-        <ul className="space-y-4">
-          {filteredTemplates.map((template) => (
-            <li
-              key={template.id}
-              className="p-5 rounded-xl bg-white/10 backdrop-blur-md border border-white/20 shadow-lg hover:bg-white/20 transition"
-            >
-              <h3 className="text-xl font-semibold">{template.title}</h3>
-              <p className="mt-2">{template.description || "No description"}</p>
-              <small className="mt-2 block">
-                Created: {new Date(template.created_at).toLocaleDateString()}
-              </small>
-              <div className="mt-4 flex items-center gap-3">
-                <label className="mr-2">Status:</label>
-                <select
-                  value={statusMap[template.id] || "pending"}
-                  onChange={(e) =>
-                    handleStatusChange(template.id, e.target.value)
-                  }
-                  disabled={updatingId === template.id}
-                  className="bg-white/20 text-white px-2 py-1 rounded"
-                >
-                  <option value="pending">Pending</option>
-                  <option value="completed">Completed</option>
-                </select>
-                {updatingId === template.id && (
-                  <span className="ml-2">Updating...</span>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       ) : (
-        <p className="mt-6">No checklists found.</p>
+        <p className="mt-6 text-gray-500 text-center text-lg">
+          No templates found.
+        </p>
       )}
     </div>
   );
-}
+};
 
 export default MaintainerChecklists;
