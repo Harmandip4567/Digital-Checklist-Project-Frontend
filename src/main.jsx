@@ -13,6 +13,7 @@ import ExistingTemplates from "./pages/ExistingTemplates.jsx";
 import TemplateItems from "./pages/TemplateItems.jsx";
 import MaintainerChecklists from "./pages/MaintainerChecklists.jsx";
 import MaintainerTemplateDetails from "./pages/MaintainerTemplateDetails.jsx";
+import MaintainerTemplateAction from "./pages/MaintainerTemplateAction.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <App />
@@ -41,6 +42,10 @@ createRoot(document.getElementById("root")).render(
         <Route
           path="/maintainer-template/:id"
           element={<MaintainerTemplateDetails />}
+        />
+        <Route
+          path="/maintainer-template-action/:id"
+          element={<MaintainerTemplateAction />}
         />
       </Routes>
     </BrowserRouter>
