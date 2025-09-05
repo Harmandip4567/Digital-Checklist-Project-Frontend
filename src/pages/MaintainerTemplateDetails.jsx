@@ -10,6 +10,7 @@ function MaintainerTemplateDetails() {
   const [template, setTemplate] = useState({});
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [itemResponses, setItemResponses] = useState({});
 
   // Get delayReason and notes from query params if passed
   const query = new URLSearchParams(location.search);
@@ -29,6 +30,9 @@ function MaintainerTemplateDetails() {
       );
       setTemplate(res.data.template);
       setItems(res.data.items);
+      if (res.data.template.item_responses) {
+        setItemResponses(JSON.parse(res.data.template.item_responses));
+      }
       setLoading(false);
     } catch (err) {
       console.error("Error fetching template details:", err);
@@ -77,6 +81,7 @@ function MaintainerTemplateDetails() {
                 <th className="px-6 py-3">Label</th>
                 <th className="px-6 py-3">Input Type</th>
                 <th className="px-6 py-3">Required</th>
+                <th className="px-6 py-3">Maintainer Input</th>
                 <th className="px-6 py-3">Frequency</th>
                 <th className="px-6 py-3">Unit</th>
                 <th className="px-6 py-3">Options</th>
@@ -105,6 +110,20 @@ function MaintainerTemplateDetails() {
                     >
                       {item.required ? "Yes" : "No"}
                     </span>
+                  </td>
+                  <td className="px-6 py-3 text-gray-600">                   
+                    {item.input_type === "checkbox" ? (
+                      <input
+                        type="checkbox"
+                        checked={!!itemResponses[item.id]}
+                        disabled
+                        className="w-5 h-5"
+                      />
+                    ) : itemResponses[item.id] !== undefined ? (
+                      itemResponses[item.id].toString()
+                    ) : (
+                      "-"
+                    )}
                   </td>
                   <td className="px-6 py-3 text-gray-600">
                     {item.frequency || "-"}

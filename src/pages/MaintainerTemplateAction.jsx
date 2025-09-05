@@ -9,8 +9,9 @@ function MaintainerTemplateAction() {
   const [delayReason, setDelayReason] = useState("");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("");
-  const [file, setFile] = useState(null); // <-- file state
+  const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [itemResponses, setItemResponses] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,6 +41,10 @@ function MaintainerTemplateAction() {
   const handleStatusToggle = () => {
     setStatus(status === "pending" ? "completed" : "pending");
   };
+  // Handle input change for checklist items
+  const handleItemChange = (itemId, value) => {
+    setItemResponses((prev) => ({ ...prev, [itemId]: value }));
+  };
 
   // Submit button sends all values to backend, including file
   const handleSubmit = async () => {
@@ -52,6 +57,7 @@ function MaintainerTemplateAction() {
       if (file) {
         formData.append("file", file);
       }
+      formData.append("item_responses", JSON.stringify(itemResponses));
       await axios.put(
         `http://localhost:8000/checklist/details/${id}/status`,
         formData,
@@ -81,7 +87,7 @@ function MaintainerTemplateAction() {
       </h1>
       <form
         className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200 mb-8"
-        onSubmit={e => e.preventDefault()}
+        onSubmit={(e) => e.preventDefault()}
       >
         <div className="mb-4">
           <label className="block font-semibold text-gray-700">Title</label>
@@ -123,8 +129,9 @@ function MaintainerTemplateAction() {
                 <tr className="bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-left text-sm uppercase tracking-wider">
                   <th className="px-4 py-2">Order</th>
                   <th className="px-4 py-2">Label</th>
-                  <th className="px-4 py-2">Type</th>
-                  <th className="px-4 py-2">Required</th>
+                  {/* <th className="px-4 py-2">Type</th>
+                  <th className="px-4 py-2">Required</th> */}
+                  <th className="px-4 py-2">Input</th>
                   <th className="px-4 py-2">Frequency</th>
                   <th className="px-4 py-2">Unit</th>
                   <th className="px-4 py-2">Options</th>
@@ -135,9 +142,40 @@ function MaintainerTemplateAction() {
                   <tr key={item.id}>
                     <td className="px-4 py-2">{item.order}</td>
                     <td className="px-4 py-2">{item.label}</td>
-                    <td className="px-4 py-2">{item.input_type}</td>
+                    {/* <td className="px-4 py-2">{item.input_type}</td>
                     <td className="px-4 py-2">
                       {item.required ? "Yes" : "No"}
+                    </td> */}
+                    <td className="px-4 py-2">
+                    {item.input_type === "text" && (
+                      <input
+                        type="text"
+                        required={item.required}
+                        value={itemResponses[item.id] || ""}
+                        onChange={e => handleItemChange(item.id, e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        placeholder={item.label}
+                      />
+                    )}
+                    {item.input_type === "number" && (
+                      <input
+                        type="number"
+                        required={item.required}
+                        value={itemResponses[item.id] || ""}
+                        onChange={e => handleItemChange(item.id, e.target.value)}
+                        className="border rounded px-2 py-1 w-full"
+                        placeholder={item.label}
+                      />
+                      )}
+                      {item.input_type === "checkbox" && (
+                      <input
+                        type="checkbox"
+                        checked={!!itemResponses[item.id]}
+                        onChange={e => handleItemChange(item.id, e.target.checked)}
+                        className="w-5 h-5"
+                        required={item.required}
+                      />
+                      )}
                     </td>
                     <td className="px-4 py-2">{item.frequency || "-"}</td>
                     <td className="px-4 py-2">{item.unit || "-"}</td>
@@ -179,7 +217,7 @@ function MaintainerTemplateAction() {
           </label>
           <input
             type="file"
-            onChange={e => setFile(e.target.files[0])}
+            onChange={(e) => setFile(e.target.files[0])}
             className="w-full bg-white border border-gray-300 rounded px-3 py-2"
           />
         </div>
