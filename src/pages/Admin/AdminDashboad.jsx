@@ -2,47 +2,38 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FiPlus, FiList } from "react-icons/fi";
-import UserAccountDropdown from "./UserAccountDropdown";
-
+import UserAccountDropdown from "../../SharedComponents/UserAccountDropdown";
+import Headerfile from "../../SharedComponents/Headerfile"
+import Layout from "../../SharedComponents/Layout";
 function AdminDashboard() {
   const [admin, setAdmin] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
+ const fetchAdmin = async () => {
     const userId = Number(localStorage.getItem("user_id"));
     const token = localStorage.getItem("token");
 
     if (userId && token) {
-      axios
-        .get(`http://localhost:8000/users/${userId}`, {
+      try {
+        const response = await axios.get(`http://localhost:8000/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((res) => setAdmin(res.data))
-        .catch((err) => console.error(err));
+        });
+        setAdmin(response.data);
+      } catch (error) {
+        console.error("admin data nahi aya", error);
+      }
     }
-  }, []);
+  };
+  useEffect(() => {
+    fetchAdmin();}
+  , []);
 
   if (!admin) return <p className="text-gray-500 text-center mt-10">Loading...</p>;
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <Layout><div className="min-h-screen bg-gray-50 font-sans">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#004C97] to-[#0072CE] text-white shadow-md">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          {/* Logo & Title */}
-          <div className="flex items-center gap-3">
-            <img
-              src="/JswLogo.jpg"
-              alt="Company Logo"
-              className="h-10 w-10 "
-            />
-            <h1 className="text-2xl font-bold tracking-wide">Admin Dashboard</h1>
-          </div>
-
-          {/* User Dropdown */}
-          <UserAccountDropdown user={admin} />
-        </div>
-      </header>
+      <Headerfile title={"Admin Dashboard"}   />
+        
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 py-8">
@@ -76,7 +67,8 @@ function AdminDashboard() {
           </p>
         </div>
       </main>
-    </div>
+    </div></Layout>
+    
   );
 }
 

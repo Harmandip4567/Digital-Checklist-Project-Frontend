@@ -1,23 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { FaUserCircle } from "react-icons/fa"; //used for using user icon
+import { HandleClickOutside } from "../CustomHooks/HandleClickOutside";
 export default function UserAccountDropdown({ user }) {
   const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
   
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setOpen(false);
-      }
-    }
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open]);
+  const dropdownRef = HandleClickOutside(()=>setOpen(false)); // handles if we click outside
 
   return (
     <div style={{ position: "relative", display: "inline-block" }}>
@@ -41,7 +28,7 @@ export default function UserAccountDropdown({ user }) {
             borderRadius: "4px",
             padding: "10px",
             marginTop: "5px",
-            width: "220px",
+            width: "320px",
             boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             zIndex: 1000,
             userSelect: "none",

@@ -28,6 +28,9 @@ Inside handleClickOutside:
 
 Checks if (dropdownRef.current && !dropdownRef.current.contains(event.target)) → meaning:
 
+dropdownRef.current : return true if its used in any any part of code like <div ref=useDownRef></div>
+contains  : tells is the click occurs inside or outside the code
+
 If you clicked outside the dropdown, set open to false.
 
 When open changes to false, a re-render happens:

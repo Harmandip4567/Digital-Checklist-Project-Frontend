@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
-
+import Headerfile from "../../SharedComponents/Headerfile"
+import Layout from "../../SharedComponents/Layout";
 const emptyStep = () => ({
   order: 1,
   label: "",
@@ -17,6 +18,7 @@ function CreateTemplate() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [steps, setSteps] = useState([emptyStep()]);
+  const [orderValue,setOrderValue]=useState(1);
   const navigate = useNavigate();
 
   const addStep = () => setSteps(prev => [...prev, { ...emptyStep(), order: prev.length + 1 }]);
@@ -44,12 +46,14 @@ function CreateTemplate() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-blue-50 to-blue-100 font-sans">
+    <Layout><div className="min-h-screen  bg-gray-50">
+      
+      <Headerfile title={"Create Checklist Template"} />
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#004C97] to-[#0072CE] text-white flex items-center px-6 py-4 shadow-lg">
+      {/* <header className="bg-gradient-to-r from-[#004C97] to-[#0072CE] text-white flex items-center px-6 py-4 shadow-lg">
         <img src="JswLogo.jpg" alt="Company Logo" className="h-10 w-auto mr-6" />
         <h1 className="text-2xl md:text-3xl font-bold tracking-wide">Create Checklist Template</h1>
-      </header>
+      </header> */}
 
       {/* Form */}
       <main className="flex-grow p-6">
@@ -172,6 +176,8 @@ function CreateTemplate() {
         </form>
       </main>
     </div>
+    </Layout>
+    
   );
 }
 

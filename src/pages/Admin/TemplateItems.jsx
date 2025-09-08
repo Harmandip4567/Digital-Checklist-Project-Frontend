@@ -1,41 +1,79 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams } from "react-router-dom";
+import { Navigate, useParams } from "react-router-dom";
 import EditTemplate from "./EditTemplate";
 import { FiEdit3 } from "react-icons/fi";
-import { MdOutlineInventory2 } from "react-icons/md";
 import AddItemsInTemplate from "./AddItemsInTemplate";
+import Headerfile from "../../SharedComponents/Headerfile"
+import Layout from "../../SharedComponents/Layout";
+import FetchTemplateAndItems from "../../Axios/FetchTemplateAndItems";
+import DeleteItem from "../../Axios/DeleteItem";
+import { useNavigate } from "react-router-dom";
+// imports  for using sidebar add and edit button
+import { useLocation } from "react-router-dom";
+
+
 function TemplateItems() {
   const { id } = useParams();
   const [templateItems, setTemplateItems] = useState([]);
   const [template, setTemplate] = useState({});
+ const navigate=useNavigate();
+  // imports  for using sidebar add and edit button
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const action=params.get("action");
+  const [isAdding, setIsAdding] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const[isAdding, setIsAdding] = useState(false);
+  // const [deleteItemFormSidebar,setDeleteItemFormSidebar]=useState(false);
+  
   useEffect(() => {
     fetchTemplateItems();
-  }, [id]);
+
+    console.log("Template Items",templateItems);
+
+    
+  }, [id]); 
+
+  useEffect(()=>{
+  setIsAdding(action === "add");
+    setIsEditing(action === "edit");
+    
+  },[action]);
 
   const fetchTemplateItems = async () => {
+    const data = await FetchTemplateAndItems(id);
+    setTemplate(data.template);
+    setTemplateItems(data.items);};
+
+
+    const deleteItem = async (itemId) => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.get(
-        `http://localhost:8000/checklist/template_with_items/${id}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setTemplateItems(res.data.items);
-      setTemplate(res.data.template);
-    } catch (err) {
-      console.error("Error fetching template items:", err);
+      await DeleteItem(itemId);
+      setTemplateItems(templateItems.filter((item) => item.id != itemId));
+      alert("Item deleted successfully");
+      fetchTemplateItems();
+      navigate(`/template/${id}`);
+    } catch (error) {
+      alert("Item Deletion Failed");
+      console.error("Error deleting item:", error);
     }
   };
-
   return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans">
+    
+    <Layout>
+      {console.log(" On SideBar : edit button",isEditing,"  Add Button" ,isAdding)}
+      <div className="min-h-screen bg-gray-50 p-8 font-sans">
       {/* Header */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-        <MdOutlineInventory2 className="text-indigo-600" size={32} />
-        Template Details
-      </h1>
+      <Headerfile title="Template Details" />
+
+      {/* edit template Button */}
+      <button
+        onClick={() => setIsEditing(true)}
+        className=" flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-purple-500 text-white px-4 py-2 my-2 rounded-lg shadow-md transition-all"
+      >
+        <FiEdit3 size={18} />
+        Edit Template
+      </button>
 
       {/* Template Info Card */}
       {template ? (
@@ -50,31 +88,28 @@ function TemplateItems() {
             <span className="font-medium">Created At:</span>{" "}
             {new Date(template.created_at).toLocaleString()}
           </p>
-          {/* edit template Button */}
-          <button
-            onClick={() => setIsEditing(true)}
-            className="mt-4 flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md transition-all"
-          >
-            <FiEdit3 size={18} />
-            Edit Template
-          </button>
-          {/* {add Item Button} */}
-          <button
-            onClick={() => setIsAdding(true)}
-            className="mt-4 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md"
-          >
-            + Add Item
-          </button>
         </div>
       ) : (
         <p className="text-gray-500">Loading template details...</p>
       )}
 
-      {/* Template Items Table */}
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-        Template Items
-      </h2>
+      <div className="flex justify-between items-center ">
+        {/* Template Items Table */}
+        <h2 className="text-2xl font-semibold text-gray-800 ml-10">
+          Template Items
+        </h2>
+        {/* {add Item Button} */}
+        <button
+          onClick={() => setIsAdding(true)}
+          className="mt-4 mb-3 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg shadow-md"
+        >
+          + Add Item
+        </button>
+      </div>
+
       {templateItems.length > 0 ? (
+        console.log("Template Items",templateItems),
+        console.log("Template Items length",templateItems.length),
         <div className="overflow-x-auto bg-white rounded-2xl shadow-lg border border-gray-200">
           <table className="w-full border-collapse">
             <thead>
@@ -85,6 +120,7 @@ function TemplateItems() {
                 <th className="px-6 py-3">Required</th>
                 <th className="px-6 py-3">Frequency</th>
                 <th className="px-6 py-3">Unit</th>
+                <th className="px-6 py-3">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -117,6 +153,14 @@ function TemplateItems() {
                   <td className="px-6 py-3 text-gray-600">
                     {item.unit || "-"}
                   </td>
+                  <td>
+                    <button
+                      onClick={() => deleteItem(item.id)}
+                      className="px-5 py-1 pb-1.5 bg-red-600 text-white rounded-lg shadow-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -136,26 +180,30 @@ function TemplateItems() {
             setTemplate(updatedTemplate);
             setTemplateItems(updatedItems);
             setIsEditing(false);
+            navigate(`/template/${id}`);
           }}
         />
+        
       )}
       {/* {Add Item} */}
       {isAdding && (
-  <AddItemsInTemplate
-    templateId={template.id}
-    onClose={() => setIsAdding(false)}
-    onSave={(newItem) => {
-      setTemplateItems([...templateItems, newItem]);
-      setIsAdding(false);
-    }}
-  />
-)}
-    </div>
+        <AddItemsInTemplate itemsSize={templateItems.length}
+          templateId={template.id}
+          onClose={() => setIsAdding(false)}
+          onSave={(newItem) => {
+            setTemplateItems([...templateItems, newItem]);
+            setIsAdding(false);
+            navigate(`/template/${id}`);
+          }}
+        />
+      )}
+
+    </div></Layout>
+    
   );
 }
 
 export default TemplateItems;
-
 
 // import React, { useEffect, useState } from "react";
 // import axios from "axios";
@@ -275,5 +323,4 @@ export default TemplateItems;
 //     </div>
 //   );
 // }
-
-// export default TemplateItems;
+// export default TemplateItems
