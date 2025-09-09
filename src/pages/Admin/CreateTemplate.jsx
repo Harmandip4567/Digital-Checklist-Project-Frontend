@@ -28,20 +28,59 @@ function CreateTemplate() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const created_by = Number(localStorage.getItem("user_id")) || null;
-    const payload = { title, description, created_by, steps };
+    
+    // Validate required fields
+    if (!title.trim()) {
+      alert("Please enter a template title");
+      return;
+    }
+    
+    if (steps.length === 0) {
+      alert("Please add at least one step");
+      return;
+    }
+    
+    // Validate each step
+    for (const step of steps) {
+      if (!step.label.trim()) {
+        alert("Please enter a label for all steps");
+        return;
+      }
+    }
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      const payload = { 
+        title, 
+        description, 
+        steps: steps.map((step, index) => ({
+          ...step,
+          order: index + 1 // Ensure correct ordering
+        }))
+      };
+
       await axios.post("http://localhost:8000/checklist/templates", payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
+      
       alert("✅ Template created successfully");
-      setTitle(""); setDescription(""); setSteps([emptyStep()]);
+      setTitle("");
+      setDescription("");
+      setSteps([emptyStep()]);
       navigate("/admin-dashboard");
     } catch (err) {
-      console.error(err);
-      alert("❌ Failed to create template");
+      console.error("Error creating template:", err);
+      if (err.response?.status === 401) {
+        alert("Session expired. Please login again.");
+        navigate("/login");
+      } else {
+        alert(err.response?.data?.detail || "❌ Failed to create template");
+      }
     }
   };
 
