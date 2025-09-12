@@ -2,36 +2,51 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   FiHome,
-  FiFilePlus,
   FiFolder,
-  FiList,
   FiChevronDown,
   FiChevronRight,
   FiFileText,
-  FiMoreVertical,
 } from "react-icons/fi";
 import { useNavigate, useLocation } from "react-router-dom";
 import FetchExistingTemplates from "../Axios/FetchExistingTemplates";
-function SideBarMaintainer() {
+
+// Define TypeScript interface for a template
+interface Template {
+  id: number;
+  title: string;
+  description?: string; // optional if backend sometimes doesn't send it
+}
+
+const SideBarMaintainer: React.FC = () => {
   const navigate = useNavigate();
-  const [showTemplates, setShowTemplates] = useState(false);
-  const [ShowUSedTemplates, setShowUsedTemplates] = useState(false);
-  const [Existingtemplates, setExistingTemplates] = useState([]);
-  const [usedTemplates, setUsedtemplates] = useState([]);
   const location = useLocation();
 
+  const [showTemplates, setShowTemplates] = useState<boolean>(false);
+  const [showUsedTemplates, setShowUsedTemplates] = useState<boolean>(false);
+  const [existingTemplates, setExistingTemplates] = useState<Template[]>([]);
+  const [usedTemplates, setUsedTemplates] = useState<Template[]>([]);
+
+  // Fetch all available templates
   const fetchExistingTemplates = async () => {
-    const res = await FetchExistingTemplates();
-    setExistingTemplates(res.data);
+    try {
+      const res = (await FetchExistingTemplates()) as { data: Template[] };
+      setExistingTemplates(res.data);
+    } catch (err) {
+      console.error("Error fetching existing templates:", err);
+    }
   };
-  //--------------checklist used by maintainer----------------
+
+  // Fetch templates already used by the maintainer
   const fetchUsedTemplates = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8000/checklist/usedByMaintainer", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setUsedtemplates(res.data);
+      if (!token) return;
+
+      const res = await axios.get<Template[]>(
+        "http://localhost:8000/checklist/usedByMaintainer",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setUsedTemplates(res.data);
     } catch (err) {
       console.error("Error fetching used checklists:", err);
     }
@@ -49,7 +64,7 @@ function SideBarMaintainer() {
         {/* Maintainer Dashboard */}
         <li>
           <button
-            onClick={() => navigate("/maintainer-dashboard")}
+            onClick={() => navigate("/maintainer/dashboard")}
             className="flex items-center space-x-3 cursor-pointer p-2 rounded-md hover:bg-gray-200/70 text-gray-800 w-full text-left"
           >
             <FiHome className="text-xl" />
@@ -61,9 +76,7 @@ function SideBarMaintainer() {
         <li>
           <div className="flex flex-row">
             <button
-              onClick={() => {
-                navigate("/maintainer-checklists");
-              }}
+              onClick={() => navigate("/maintainer/checklists")}
               className="flex items-center justify-between w-full p-2 rounded-md hover:bg-gray-200/70 text-gray-800"
             >
               <div className="flex items-center space-x-3">
@@ -78,15 +91,15 @@ function SideBarMaintainer() {
 
           {showTemplates && (
             <ul className="ml-4 mt-2 space-y-1 border-l border-gray-300 pl-3">
-              {Existingtemplates.map((template) => (
+              {existingTemplates.map((template) => (
                 <li
                   key={template.id}
                   className="flex items-center justify-between relative"
                 >
                   <button
-                    onClick={() => {
-                      navigate(`/maintainer-template-action/${template.id}`);
-                    }}
+                    onClick={() =>
+                      navigate(`/maintainer/template-action/${template.id}`)
+                    }
                     className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
                   >
                     <FiFileText className="text-gray-500" />
@@ -98,10 +111,11 @@ function SideBarMaintainer() {
           )}
         </li>
 
-        {/* For showing:  Templates  used by maintainer */}
+        {/* Used Templates */}
         <li>
           <div className="flex flex-row">
-            <button onClick={()=>{navigate("/maintainer-used-templates")}}
+            <button
+              onClick={() => navigate("/maintainer/used-templates")}
               className="flex items-center justify-between w-full p-2 rounded-md hover:bg-gray-200/70 text-gray-800"
             >
               <div className="flex items-center space-x-3">
@@ -109,12 +123,12 @@ function SideBarMaintainer() {
                 <span>Used Templates</span>
               </div>
             </button>
-            <button onClick={() => setShowUsedTemplates(!ShowUSedTemplates)}>
-              {ShowUSedTemplates ? <FiChevronDown /> : <FiChevronRight />}
+            <button onClick={() => setShowUsedTemplates(!showUsedTemplates)}>
+              {showUsedTemplates ? <FiChevronDown /> : <FiChevronRight />}
             </button>
           </div>
 
-          {ShowUSedTemplates && (
+          {showUsedTemplates && (
             <ul className="ml-4 mt-2 space-y-1 border-l border-gray-300 pl-3">
               {usedTemplates.map((template) => (
                 <li
@@ -122,9 +136,9 @@ function SideBarMaintainer() {
                   className="flex items-center justify-between relative"
                 >
                   <button
-                    onClick={() => {
-                      navigate(`/maintainer-template-Details/${template.id}`);
-                    }}
+                    onClick={() =>
+                      navigate(`/maintainer/template-Details/${template.id}`)
+                    }
                     className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
                   >
                     <FiFileText className="text-gray-500" />
@@ -138,6 +152,6 @@ function SideBarMaintainer() {
       </ul>
     </div>
   );
-}
+};
 
 export default SideBarMaintainer;

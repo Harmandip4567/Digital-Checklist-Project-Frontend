@@ -12,16 +12,27 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import FetchExistingTemplates from "../Axios/FetchExistingTemplates";
 
-function SidebarAdmin() {
+// Define TypeScript type for template
+interface Template {
+  id: number;
+  title: string;
+}
+
+const SidebarAdmin: React.FC = () => {
   const navigate = useNavigate();
-  const [showTemplates, setShowTemplates] = useState(false);
-  const [Existingtemplates, setExistingTemplates] = useState([]);
-  const [openMenuId, setOpenMenuId] = useState(null); // track which template's menu is open
   const location = useLocation();
 
+  const [showTemplates, setShowTemplates] = useState<boolean>(false);
+  const [existingTemplates, setExistingTemplates] = useState<Template[]>([]);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null); // track which template's menu is open
+
   const fetchExistingTemplates = async () => {
-    const res = await FetchExistingTemplates();
-    setExistingTemplates(res.data);
+    try {
+      const res = await FetchExistingTemplates() as { data: Template[] };
+      setExistingTemplates(res.data);
+    } catch (error) {
+      console.error("Error fetching templates:", error);
+    }
   };
 
   useEffect(() => {
@@ -35,7 +46,7 @@ function SidebarAdmin() {
         {/* Admin Dashboard */}
         <li>
           <button
-            onClick={() => navigate("/admin-dashboard")}
+            onClick={() => navigate("/admin/dashboard")}
             className="flex items-center space-x-3 cursor-pointer p-2 rounded-md hover:bg-gray-200/70 text-gray-800 w-full text-left"
           >
             <FiHome className="text-xl" />
@@ -46,7 +57,7 @@ function SidebarAdmin() {
         {/* Create Template */}
         <li>
           <button
-            onClick={() => navigate("/Create-template")}
+            onClick={() => navigate("/admin/Create-template")}
             className="flex items-center space-x-3 w-full text-left p-2 rounded-md hover:bg-gray-200/70 text-gray-800"
           >
             <FiFilePlus className="text-xl" />
@@ -58,9 +69,7 @@ function SidebarAdmin() {
         <li>
           <div className="flex flex-row">
             <button
-              onClick={() => {
-                navigate("/ExistingTemplates");
-              }}
+              onClick={() => navigate("/admin/ExistingTemplates")}
               className="flex items-center justify-between w-full p-2 rounded-md hover:bg-gray-200/70 text-gray-800"
             >
               <div className="flex items-center space-x-3">
@@ -75,15 +84,15 @@ function SidebarAdmin() {
 
           {showTemplates && (
             <ul className="ml-4 mt-2 space-y-1 border-l border-gray-300 pl-3">
-              {Existingtemplates.map((template) => (
+              {existingTemplates.map((template) => (
                 <li
                   key={template.id}
                   className="flex items-center justify-between relative"
                 >
                   <button
-                    onClick={() => {
-                      navigate(`/template/${template.id}?action=view`);
-                    }}
+                    onClick={() =>
+                      navigate(`/admin/template/${template.id}?action=view`)
+                    }
                     className="flex items-center gap-2 w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-200 rounded-md transition-colors"
                   >
                     <FiFileText className="text-gray-500" />
@@ -93,30 +102,28 @@ function SidebarAdmin() {
                   {/* 3 dots button */}
                   <button
                     onClick={() =>
-                      setOpenMenuId(
-                        openMenuId === template.id ? null : template.id
-                      )
+                      setOpenMenuId(openMenuId === template.id ? null : template.id)
                     }
                     className="p-2 rounded-full hover:bg-gray-200"
                   >
                     <FiMoreVertical />
                   </button>
 
-                  {/* Dropdown Menu: Here we use openMenuId state so that when we click the three dots button then only for that particular template the Dropdown menu button  shows*/}
+                  {/* Dropdown Menu */}
                   {openMenuId === template.id && (
                     <div className="absolute left-32 top-full mt-1 w-32 bg-white border rounded-md shadow-lg z-10">
                       <button
-                        onClick={() => {
-                          navigate(`/template/${template.id}?action=add`);
-                        }}
+                        onClick={() =>
+                          navigate(`/admin/template/${template.id}?action=add`)
+                        }
                         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                       >
                         Add Tasks
                       </button>
                       <button
-                        onClick={() => {
-                          navigate(`/template/${template.id}?action=edit`);
-                        }}
+                        onClick={() =>
+                          navigate(`/admin/template/${template.id}?action=edit`)
+                        }
                         className="block w-full text-left px-4 py-2 hover:bg-gray-100"
                       >
                         Edit Tasks
@@ -124,7 +131,7 @@ function SidebarAdmin() {
                       <button
                         onClick={() => {
                           navigate(
-                            `/ExistingTemplates?action=delete&templateId=${template.id}`
+                            `/admin/ExistingTemplates?action=delete&templateId=${template.id}`
                           );
                           fetchExistingTemplates();
                         }}
@@ -140,7 +147,7 @@ function SidebarAdmin() {
           )}
         </li>
 
-        {/* Maintainer submitions */}
+        {/* Maintainer submissions */}
         <li className="flex items-center space-x-3 cursor-pointer p-2 rounded-md hover:bg-gray-200/70 text-gray-800">
           <FiList className="text-xl" />
           <span>Maintainer Tasks status</span>
@@ -148,6 +155,6 @@ function SidebarAdmin() {
       </ul>
     </div>
   );
-}
+};
 
 export default SidebarAdmin;

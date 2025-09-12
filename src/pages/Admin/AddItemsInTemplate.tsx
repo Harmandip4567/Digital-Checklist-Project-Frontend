@@ -1,8 +1,27 @@
-import React, { useState } from "react";
+import  { useState,ChangeEvent,FormEvent } from "react";
 import axios from "axios";
+// typescript work -----------------
+//Defining types for props
+interface AddItemsInTemplateProps{
+  itemsSize:number;
+  templateId:number;
+  onClose:()=>void;
+  onSave:(newItem:any)=>void;
+}
+// ✅ Define type for form state
+interface FormData{
+  order:number;
+  label:string;
+  input_type:string;
+  required:boolean;
+  frequency:string;
+  unit:string;
+}
+// -----------------------------------
 
-function AddItemsInTemplate({ itemsSize, templateId, onClose, onSave }) {
-  const [formData, setFormData] = useState({
+
+function AddItemsInTemplate({ itemsSize, templateId, onClose, onSave }:AddItemsInTemplateProps) {
+  const [formData, setFormData] = useState<FormData>({
     order: itemsSize+1,
     label: "",
     input_type: "text",
@@ -15,15 +34,19 @@ function AddItemsInTemplate({ itemsSize, templateId, onClose, onSave }) {
 
   const token = localStorage.getItem("token");
 
-  const handleChange = (e) => {
-    const {name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const {name, value, type } = e.target;
+
+     const checked =
+  type === "checkbox" && "checked" in e.target ? e.target.checked : false;
+
+setFormData({
+  ...formData,
+  [name]: type === "checkbox" ? checked : value,
+});
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:FormEvent) => {
     e.preventDefault();
     try {
       console.log("Submitting form data:", formData);
@@ -43,7 +66,7 @@ function AddItemsInTemplate({ itemsSize, templateId, onClose, onSave }) {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div className="bg-white rounded-lg p-6 w-96 shadow-lg">
-       { console.log(" hello Template Items in AddItemsInTemplate",itemsSize)},
+       {/* { console.log(" hello Template Items in AddItemsInTemplate",itemsSize)}, */}
         <h2 className="text-xl font-bold mb-4">Add New Item</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">

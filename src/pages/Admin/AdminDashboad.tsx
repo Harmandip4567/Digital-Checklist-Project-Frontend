@@ -2,13 +2,19 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { FiPlus, FiList } from "react-icons/fi";
-import UserAccountDropdown from "../../SharedComponents/UserAccountDropdown";
+// import UserAccountDropdown from "../../SharedComponents/UserAccountDropdown";
 import Headerfile from "../../SharedComponents/Headerfile"
 import Layout from "../../SharedComponents/Layout";
-function AdminDashboard() {
-  const [admin, setAdmin] = useState(null);
+interface Admin {
+  id: number;
+  username: string;
+  email: string;
+  role: string;
+}
+function AdminDashboard(): React.ReactElement{
+  const [admin, setAdmin] = useState<Admin | null>(null); // Admin | null is TypeScript’s union type
   const navigate = useNavigate();
- const fetchAdmin = async () => {
+ const fetchAdmin = async ():Promise<void>=> {                    //a promise that doesn’t resolve with any meaningful value. It only signals completion (success or failure), not data.
     const userId = Number(localStorage.getItem("user_id"));
     const token = localStorage.getItem("token");
 
@@ -42,7 +48,7 @@ function AdminDashboard() {
         <div className="flex flex-wrap gap-4">
           {/* Create Template Button */}
           <button
-            onClick={() => navigate("/Create-template")}
+            onClick={() => navigate("/admin/Create-template")}
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-3 rounded-xl shadow-md transition-all"
           >
             <FiPlus size={20} />
@@ -51,7 +57,7 @@ function AdminDashboard() {
 
           {/* Existing Templates Button */}
           <button
-            onClick={() => navigate("/ExistingTemplates")}
+            onClick={() => navigate("/admin/ExistingTemplates")}
             className="flex items-center gap-2 bg-indigo-500 hover:bg-indigo-600 text-white font-medium px-5 py-3 rounded-xl shadow-md transition-all"
           >
             <FiList size={20} />

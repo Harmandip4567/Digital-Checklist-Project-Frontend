@@ -1,21 +1,58 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-function EditTemplate({ template, templateItems, onClose, onSave }) {
-  const [localTemplate, setLocalTemplate] = useState({ ...template });
-  const [localItems, setLocalItems] = useState(
+// Define the type for a template item
+interface TemplateItem {
+  id: number;
+  label: string;
+  input_type: string;
+  required: boolean;
+  frequency?: string;
+  unit?: string;
+}
+
+// Define the type for a template
+interface Template {
+  id: number;
+  title: string;
+  description: string;
+}
+
+// Props for the EditTemplate component
+interface EditTemplateProps {
+  template: Template;
+  templateItems: TemplateItem[];
+  onClose: () => void;
+  onSave: (updatedTemplate: Template, updatedItems: TemplateItem[]) => void;
+}
+
+const EditTemplate: React.FC<EditTemplateProps> = ({
+  template,
+  templateItems,
+  onClose,
+  onSave,
+}) => {
+  // Explicitly type the state
+  const [localTemplate, setLocalTemplate] = useState<Template>({ ...template });
+  const [localItems, setLocalItems] = useState<TemplateItem[]>(
     templateItems.map((item) => ({
       ...item,
-      required: item.required === true || item.required === "true",
+      required: Boolean(item.required), // ensures boolean
     }))
   );
 
-  const handleItemChange = (index, field, value) => {
+  // Generic function to handle changes in template items
+  const handleItemChange = <K extends keyof TemplateItem>(
+    index: number,
+    field: K,
+    value: TemplateItem[K]
+  ) => {
     const updated = [...localItems];
     updated[index][field] = value;
     setLocalItems(updated);
   };
 
+  // Save template and items
   const handleSave = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -32,15 +69,14 @@ function EditTemplate({ template, templateItems, onClose, onSave }) {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      onSave(res.data, res.data.items);
-    } catch (err) {
+      onSave(res.data as Template, res.data.items as TemplateItem[]);
+    } catch (err: any) {
       console.error("Error saving template:", err.response?.data || err.message);
     }
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-50">
-      {/* Card */}
       <div className="w-full max-w-4xl bg-white/90 backdrop-blur-md rounded-2xl shadow-2xl p-8 border border-gray-200">
         <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-2">
           ✏️ Edit Template
@@ -68,25 +104,19 @@ function EditTemplate({ template, templateItems, onClose, onSave }) {
           <textarea
             value={localTemplate.description}
             onChange={(e) =>
-              setLocalTemplate({
-                ...localTemplate,
-                description: e.target.value,
-              })
+              setLocalTemplate({ ...localTemplate, description: e.target.value })
             }
             className="w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:outline-none shadow-sm"
-            rows="3"
+            rows={3}
           />
         </div>
 
         {/* Table */}
-        <h3 className="text-lg font-semibold text-gray-800 mb-3">
-          Template Items
-        </h3>
+        <h3 className="text-lg font-semibold text-gray-800 mb-3">Template Items</h3>
         <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
           <table className="min-w-full text-sm text-left">
             <thead className="bg-gradient-to-r from-blue-50 to-indigo-50 text-gray-800 font-semibold">
               <tr>
-                
                 <th className="px-4 py-3">Label</th>
                 <th className="px-4 py-3">Input Type</th>
                 <th className="px-4 py-3 text-center">Required</th>
@@ -102,7 +132,6 @@ function EditTemplate({ template, templateItems, onClose, onSave }) {
                     index % 2 === 0 ? "bg-white" : "bg-gray-50"
                   }`}
                 >
-                  
                   <td className="px-4 py-2">
                     <input
                       value={item.label}
@@ -173,9 +202,10 @@ function EditTemplate({ template, templateItems, onClose, onSave }) {
       </div>
     </div>
   );
-}
+};
 
 export default EditTemplate;
+
 
 // import React, { useState } from "react";
 // import axios from "axios";

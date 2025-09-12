@@ -1,35 +1,49 @@
-import { useState } from "react";
+import React, { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Signup = () => {
-  const [formData, setFormData] = useState({
+// ✅ Define type for signup form data
+interface SignupFormData {
+  username: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
+const Signup: React.FC = () => {
+  const [formData, setFormData] = useState<SignupFormData>({
     username: "",
-    password: "",
     email: "",
+    password: "",
     role: "",
   });
 
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  // ✅ Typed handleChange
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const handleSignup = async (e) => {
+  // ✅ Typed handleSubmit
+  const handleSignup = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await axios.post("http://localhost:8000/auth/signup", formData);
       alert("Signup successful!");
       navigate("/login");
-    } catch (error) {
+    } catch (error: any) {
       alert(error.response?.data?.detail || "Signup failed. Please try again.");
     }
   };
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Section with Renewable Gradient */}
+      {/* Left Section with Gradient */}
       <div className="hidden md:flex w-1/2 bg-gradient-to-br from-teal-500 via-sky-400 to-blue-500 items-center justify-center">
         <h1 className="text-4xl font-bold text-white">Digital Checklist</h1>
       </div>
@@ -57,6 +71,7 @@ const Signup = () => {
               type="text"
               name="username"
               placeholder="Username"
+              value={formData.username}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md 
@@ -67,6 +82,7 @@ const Signup = () => {
               type="email"
               name="email"
               placeholder="Email"
+              value={formData.email}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md 
@@ -77,6 +93,7 @@ const Signup = () => {
               type="password"
               name="password"
               placeholder="Password"
+              value={formData.password}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md 
@@ -85,6 +102,7 @@ const Signup = () => {
 
             <select
               name="role"
+              value={formData.role}
               onChange={handleChange}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md 
@@ -120,6 +138,7 @@ const Signup = () => {
 };
 
 export default Signup;
+
 
 
 

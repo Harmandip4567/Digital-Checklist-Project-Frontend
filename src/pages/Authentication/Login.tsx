@@ -1,23 +1,32 @@
-import React, { useState } from "react";
+import  { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+// ✅ Define type for form data
+interface LoginFormData {
+  username: string;
+  password: string;
+}
+
 function Login() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<LoginFormData>({
     username: "",
     password: "",
   });
 
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
+  // ✅ Typed handleChange
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  // ✅ Typed handleSubmit
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -31,9 +40,9 @@ function Login() {
       localStorage.setItem("user_id", response.data.user_id);
 
       if (response.data.role === "Admin") {
-        navigate("/admin-dashboard");
+        navigate("/admin/dashboard");
       } else if (response.data.role === "Maintainer") {
-        navigate("/maintainer-dashboard");
+        navigate("/maintainer/dashboard");
       } else {
         navigate("/");
       }
@@ -45,7 +54,7 @@ function Login() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left Section with Gradient (same as signup) */}
+      {/* Left Section with Gradient */}
       <div className="hidden md:flex w-1/2 bg-gradient-to-br from-teal-500 via-sky-400 to-blue-500 items-center justify-center">
         <h1 className="text-4xl font-bold text-white">Welcome Back!</h1>
       </div>
